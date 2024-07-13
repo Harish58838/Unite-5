@@ -1,0 +1,58 @@
+import heapq
+from collections import defaultdict
+
+class Node:
+    def __init__(self, char, freq):
+        self.char = char
+        self.freq = freq
+        self.left = None
+        self.right = None
+
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+def build_huffman_tree(characters, frequencies):
+    pq = [Node(char, freq) for char, freq in zip(characters, frequencies)]
+    heapq.heapify(pq)
+    
+    while len(pq) > 1:
+        left = heapq.heappop(pq)
+        right = heapq.heappop(pq)
+        
+        merged = Node(None, left.freq + right.freq)
+        merged.left = left
+        merged.right = right
+        
+        heapq.heappush(pq, merged)
+    
+    return pq[0]
+
+def generate_huffman_codes(root, current_code, huffman_codes):
+    if root is None:
+        return
+    
+    if root.char is not None:
+        huffman_codes[root.char] = current_code
+        return
+    
+    generate_huffman_codes(root.left, current_code + '0', huffman_codes)
+    generate_huffman_codes(root.right, current_code + '1', huffman_codes)
+
+def huffman_encoding(characters, frequencies):
+    root = build_huffman_tree(characters, frequencies)
+    huffman_codes = {}
+    generate_huffman_codes(root, '', huffman_codes)
+    
+    return [(char, huffman_codes[char]) for char in huffman_codes]
+
+# Test Case 1
+n = 4
+characters = ['a', 'b', 'c', 'd']
+frequencies = [5, 9, 12, 13]
+print(huffman_encoding(characters, frequencies))
+
+# Test Case 2
+n = 6
+characters = ['f', 'e', 'd', 'c', 'b', 'a']
+frequencies = [5, 9, 12, 13, 16, 45]
+print(huffman_encoding(characters, frequencies))
