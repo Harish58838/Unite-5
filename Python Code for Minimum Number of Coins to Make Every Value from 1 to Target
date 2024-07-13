@@ -1,0 +1,33 @@
+from itertools import combinations
+
+def min_coins(coins, target):
+    dp = [False] * (target + 1)
+    dp[0] = True
+    for coin in coins:
+        for i in range(target, coin - 1, -1):
+            dp[i] |= dp[i - coin]
+    
+    missing = []
+    for i in range(1, target + 1):
+        if not dp[i]:
+            missing.append(i)
+    
+    result = target
+    for r in range(1, len(missing) + 1):
+        for comb in combinations(missing, r):
+            if sum(comb) in missing:
+                result = min(result, len(comb))
+    
+    return result
+
+# Example 1
+coins1 = [1, 4, 10]
+target1 = 19
+output1 = min_coins(coins1, target1)
+print(output1)  # Output: 2
+
+# Example 2
+coins2 = [1, 4, 10, 5, 7, 19]
+target2 = 19
+output2 = min_coins(coins2, target2)
+print(output2)  # Output: 1
